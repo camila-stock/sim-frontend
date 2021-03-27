@@ -10,16 +10,17 @@ import './_shared.css';
 const Card = () => {
 
     const [datos, setDatos] = useState(null);
-   
-window.google.charts.load('current', { packages: ['corechart'] });
-window.google.charts.setOnLoadCallback(drawChart);
+useEffect(()=> {
+    window.google.charts.load('current', { packages: ['corechart'] });
+    window.google.charts.setOnLoadCallback(drawChart);
+}, []);
 
 
+const [chart, setChart] = useState(null);
     function drawChart() {
-        var myChart
         var ctx = document.getElementById('myChart');
-        myChart?.destroy();
-        myChart= new Chart(ctx, {
+        if (chart) chart.destroy()
+        setChart(new Chart(ctx, {
           type: 'bar',
           data: {
               labels: datos?.map(d => d[1]),
@@ -42,22 +43,22 @@ window.google.charts.setOnLoadCallback(drawChart);
                   }]
               }
           }
-      });
+      }));
     }
 
     const [interval, setInterval] = React.useState('');
     
       const handleChange = (event) => {
         setInterval(event.target.value);
-        console.log(interval)
         ApiRequest.get(`/congruencial-lineal`, {n: 1000, x: 6, k: 3, c: 7, g:3, intervalos: event.target.value}).then(async ({ data }) => {
             let tableData = data.map(dato => JSON.parse(dato)).map(d => {
                 return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
             });
-    
+            
             let tableDataList = [...tableData]
             console.log(tableDataList);
             setDatos(tableDataList)
+            drawChart();
         })
       };
 
