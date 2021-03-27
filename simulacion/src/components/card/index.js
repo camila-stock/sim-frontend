@@ -4,72 +4,32 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import Chart from 'chart.js'
+import Chart from 'chart.js';
+import './_shared.css';
+
 const Card = () => {
 
     const [datos, setDatos] = useState(null);
-    useEffect(ApiRequest.get(`/histogram`).then(async ({ data }) => {
-        //console.log("data: " , data);
-        setDatos(data)
-    }));
-  
- 
-    //console.log("datos: " , datos);
-/*     ApiRequest.get(`/congruencial-lineal`, {n: 10, x: 6, k: 3, c: 7, g:3, intervalos: 10}).then(async ({ data }) => {
-        let tableData = data.map(dato => JSON.parse(dato)).map(d => {
-            return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
-        });
-
-        let tableDataList = [['Frecuencia','Cota Superior'], ...tableData]
-        console.log(tableDataList);
-        setDatos(tableDataList)
-    });
- */
-    //console.log("datos: " , datos);
-
-    window.google.charts.load('current', { packages: ['corechart'] });
-    window.google.charts.setOnLoadCallback(drawChart);
+   
+window.google.charts.load('current', { packages: ['corechart'] });
+window.google.charts.setOnLoadCallback(drawChart);
 
 
     function drawChart() {
-
-        /* var data = window.google.visualization.arrayToDataTable(datos);
-
-
-        var view = new window.google.visualization.DataView(data);
-
-        var options = {
-            title: 'Lengths of dinosaurs, in meters',
-            legend: { position: 'none' },
-        };
-
-        var chart = new window.google.visualization.Histogram(document.getElementById('chart_div'));
-        chart.draw(view, options); */
+        var myChart
         var ctx = document.getElementById('myChart');
-      console.log(ctx);
-      var myChart = new Chart(ctx, {
+        myChart?.destroy();
+        myChart= new Chart(ctx, {
           type: 'bar',
           data: {
-              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+              labels: datos?.map(d => d[1]),
               datasets: [{
                   label: '# of Votes',
-                  data: [12, 19, 3, 5, 2, 3],
-                  backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                  ],
-                  borderColor: [
-                      'rgba(255, 99, 132, 1)',
-                      'rgba(54, 162, 235, 1)',
-                      'rgba(255, 206, 86, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'
-                  ],
+                  data: datos?.map(d => d[0]),
+                  backgroundColor: 
+                  datos?.map(d => 'rgba(54, 162, 235, 0.2)'),
+                  borderColor:
+                    datos?.map(d => 'rgba(54, 162, 235, 1)'),
                   borderWidth: 1
               }]
           },
@@ -90,11 +50,20 @@ const Card = () => {
       const handleChange = (event) => {
         setInterval(event.target.value);
         console.log(interval)
+        ApiRequest.get(`/congruencial-lineal`, {n: 1000, x: 6, k: 3, c: 7, g:3, intervalos: event.target.value}).then(async ({ data }) => {
+            let tableData = data.map(dato => JSON.parse(dato)).map(d => {
+                return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
+            });
+    
+            let tableDataList = [...tableData]
+            console.log(tableDataList);
+            setDatos(tableDataList)
+        })
       };
 
     return (
         <div style={{ textAlign: '-webkit-center' }}>
-            <canvas id="myChart" width="400" height="400"></canvas>
+            <canvas id="myChart" className="chart" width="400" height="400"></canvas>
             <FormControl>
             <InputLabel id="demo-simple-select-label">Intervalos</InputLabel>
 
