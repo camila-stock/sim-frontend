@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect , useState} from 'react';
 import ApiRequest from '../../util/ApiRequest'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -8,6 +8,7 @@ import Chart from 'chart.js';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+//import  useState  from 'react-usestateref'
 import './_shared.css';
 
 const Card = () => {
@@ -15,68 +16,63 @@ const Card = () => {
     const useStyles = makeStyles((theme) => ({
         button: {
             '& > *': {
-                margin: theme.spacing(1),
-            },
-        text_box: {
-            '& > *': {
-                margin: theme.spacing(1),
-                width: '25ch',
+                margin: 20,
+                color: 'withe',
+                display: 'inline-block',
+
             },
         },
-    }}));
+        text_box: {
+            '& > *': {
+                margin: theme.spacing(0.5),
+                width: '25ch',
+                display: 'inline-block',
+
+            },
+        },
+        input_label: {
+            '& > *': {
+                margin: theme.spacing(1),
+                minWidth: 195,
+                display: 'inline-block',
+
+            },
+        },
+
+    }));
+
     const classes = useStyles();
+
     const [datos, setDatos] = useState(null);
-    const [interval, setInterval] = useState('');
+    const [intervalo, setIntervalo] = useState('');
     const [chart, setChart] = useState(null);
-    const [n, setN] = useState(null);
-    const [x, setX] = useState(null);
-    const [k, setK] = useState(null);
-    const [c, setC] = useState(null);
-    const [g, setG] = useState(null);
+    const [n, setN ] = useState(null);
+    const [x, setX ] = useState(null);
+    const [k, setK ] = useState(null);
+    const [c, setC ] = useState(null);
+    const [g, setG ] = useState(null);
     const [enviar, setEnviar] = useState(false);
 
-    function handleChangeN(event) {
-        setN(event.target.value);
+    const handleChangeN = (event) => setN( event.target.value);
+    const handleChangeX = (event) => setX( event.target.value);
+    const handleChangeK = (event) => setK( event.target.value);
+    const handleChangeG = (event) => setG( event.target.value);
+    const handleChangeC = (event) => setC( event.target.value);
+    const handleChange = (event) => setIntervalo(event.target.value);
+    const handleChangeSend = () => setEnviar(true);
 
-    }
-    function handleChangeX(event) {
-        setX(event.target.value);
-
-    }
-    function handleChangeK(event) {
-        setK(event.target.value);
-
-    }
-    function handleChangeC(event) {
-        setC(event.target.value);
-
-    }
-    function handleChangeG(event) {
-        setG(event.target.value);
-
-    }
-
-    function handleChange (event) {
-        setInterval(event.target.value);
-        console.log(interval);
-    }
-
-    function handleChangeSend (event) {
-        setEnviar(true);
-
-    }
     useEffect(() => {
-        console.log(enviar)
-        if (enviar === true ){
-            llamarApi(n, x, k, c, g, interval);
-            setEnviar(false);
-        }
+        console.log(enviar);
+        console.log(datos);
+        if(enviar === true) llamartApi();
+        setEnviar(false);
+        if(datos != null) drawChart() ;
 
-    }, [enviar])
+    }, [enviar, datos])
 
-    function llamarApi (n, x, k, c, g, interval) {
-        ApiRequest.get(`/congruencial-lineal`, {n: n, x: x, k: k, c: c, g: g, intervalos: interval})
+    function llamartApi () {
 
+        ApiRequest.get(`/congruencial-lineal`, {n:  n, x: x, k: k, c: c, g: g, intervalos: intervalo})
             .then(async ({ data }) => {
             let tableData = data.map(dato => JSON.parse(dato)).map(d => {
                 return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
@@ -86,53 +82,51 @@ const Card = () => {
             console.log(tableDataList);
             setDatos(tableDataList)
 
-            window.google.charts.load('current', { packages: ['corechart'] });
-            window.google.charts.setOnLoadCallback(drawChart);
-
         })
     }
 
 
-    function drawChart() {
-        setEnviar(false)
-        let ctx = document.getElementById('myChart');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: datos?.map(d => d[1]),
-                    datasets: [{
-                        label: '# Histograma',
-                        data: datos?.map(d => d[0]),
-                        backgroundColor:
-                            datos?.map(d => 'rgba(54, 162, 235, 0.2)'),
-                        borderColor:
-                            datos?.map(d => 'rgba(54, 162, 235, 1)'),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
-                }
-            });
+     function drawChart() {
+
+         let ctx = document.getElementById('myChart');
+         if (chart) chart.destroy()
+         setChart(
+         new Chart(ctx, {
+             type: 'bar',
+             data: {
+                 labels: datos?.map(d => d[1]),
+                 datasets: [{
+                     label: 'Cantidad de valores pseudoaleatorios por Intervalo',
+                     data: datos?.map(d => d[0]),
+                     backgroundColor:
+                         datos?.map(d => 'rgba(54, 162, 235, 0.2)'),
+                     borderColor:
+                         datos?.map(d => 'rgba(54, 162, 235, 1)'),
+                     borderWidth: 1
+                 }]
+             },
+             options: {
+                 scales: {
+                     yAxes: [{
+                         ticks: {
+                             beginAtZero: true
+                         }
+                     }]
+                 }
+             }
+         }) );
     }
 
 
     return (
         <div>
-            <div className={classes.text_box}>
-            <FormControl>
+            <div>
+            <FormControl className={classes.input_label} >
             <InputLabel  id="demo-simple-select-label">Intervalos</InputLabel>
-
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={interval}
+              value={intervalo}
               onChange={handleChange}
               style={{ width: 100 }}
               >
@@ -142,8 +136,6 @@ const Card = () => {
             </Select>
             </FormControl>
             </div>
-            <br/>
-
             <div className={classes.text_box}>
             <TextField id="outlined-basic" label="Tamaño de muestra (n)" variant="outlined" value={n} onChange={handleChangeN}/>
             </div>
@@ -166,7 +158,7 @@ const Card = () => {
               </div>
 
 
-            <div style={{ textAlign: '-webkit-center' }}>
+            <div style={{ textAlign: '-webkit-center'} }>
                 <canvas id="myChart" className="chart" width="400" height="400"></canvas>
             </div>
 
