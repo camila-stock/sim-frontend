@@ -5,68 +5,129 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Chart from 'chart.js';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 import './_shared.css';
 
 const Card = () => {
 
+    const useStyles = makeStyles((theme) => ({
+        button: {
+            '& > *': {
+                margin: theme.spacing(1),
+            },
+        text_box: {
+            '& > *': {
+                margin: theme.spacing(1),
+                width: '25ch',
+            },
+        },
+    }}));
+    const classes = useStyles();
     const [datos, setDatos] = useState(null);
-useEffect(()=> {
-    window.google.charts.load('current', { packages: ['corechart'] });
-    window.google.charts.setOnLoadCallback(drawChart);
-}, []);
+    const [interval, setInterval] = useState('');
+    const [chart, setChart] = useState(null);
+    const [n, setN] = useState(null);
+    const [x, setX] = useState(null);
+    const [k, setK] = useState(null);
+    const [c, setC] = useState(null);
+    const [g, setG] = useState(null);
+    const [enviar, setEnviar] = useState(false);
 
+    function handleChangeN(event) {
+        setN(event.target.value);
 
-const [chart, setChart] = useState(null);
-    function drawChart() {
-        var ctx = document.getElementById('myChart');
-        if (chart) chart.destroy()
-        setChart(new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: datos?.map(d => d[1]),
-              datasets: [{
-                  label: '# of Votes',
-                  data: datos?.map(d => d[0]),
-                  backgroundColor: 
-                  datos?.map(d => 'rgba(54, 162, 235, 0.2)'),
-                  borderColor:
-                    datos?.map(d => 'rgba(54, 162, 235, 1)'),
-                  borderWidth: 1
-              }]
-          },
-          options: {
-              scales: {
-                  yAxes: [{
-                      ticks: {
-                          beginAtZero: true
-                      }
-                  }]
-              }
-          }
-      }));
+    }
+    function handleChangeX(event) {
+        setX(event.target.value);
+
+    }
+    function handleChangeK(event) {
+        setK(event.target.value);
+
+    }
+    function handleChangeC(event) {
+        setC(event.target.value);
+
+    }
+    function handleChangeG(event) {
+        setG(event.target.value);
+
     }
 
-    const [interval, setInterval] = React.useState('');
-    
-      const handleChange = (event) => {
+    function handleChange (event) {
         setInterval(event.target.value);
-        ApiRequest.get(`/congruencial-lineal`, {n: 1000, x: 6, k: 3, c: 7, g:3, intervalos: event.target.value}).then(async ({ data }) => {
+        console.log(interval);
+    }
+
+    function handleChangeSend (event) {
+        setEnviar(true);
+
+    }
+    useEffect(() => {
+        console.log(enviar)
+        if (enviar === true ){
+            llamarApi(n, x, k, c, g, interval);
+            setEnviar(false);
+        }
+
+    }, [enviar])
+
+    function llamarApi (n, x, k, c, g, interval) {
+        ApiRequest.get(`/congruencial-lineal`, {n: n, x: x, k: k, c: c, g: g, intervalos: interval})
+
+            .then(async ({ data }) => {
             let tableData = data.map(dato => JSON.parse(dato)).map(d => {
                 return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
             });
-            
+
             let tableDataList = [...tableData]
             console.log(tableDataList);
             setDatos(tableDataList)
-            drawChart();
+
+            window.google.charts.load('current', { packages: ['corechart'] });
+            window.google.charts.setOnLoadCallback(drawChart);
+
         })
-      };
+    }
+
+
+    function drawChart() {
+        setEnviar(false)
+        let ctx = document.getElementById('myChart');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: datos?.map(d => d[1]),
+                    datasets: [{
+                        label: '# Histograma',
+                        data: datos?.map(d => d[0]),
+                        backgroundColor:
+                            datos?.map(d => 'rgba(54, 162, 235, 0.2)'),
+                        borderColor:
+                            datos?.map(d => 'rgba(54, 162, 235, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+    }
+
 
     return (
-        <div style={{ textAlign: '-webkit-center' }}>
-            <canvas id="myChart" className="chart" width="400" height="400"></canvas>
+        <div>
+            <div className={classes.text_box}>
             <FormControl>
-            <InputLabel id="demo-simple-select-label">Intervalos</InputLabel>
+            <InputLabel  id="demo-simple-select-label">Intervalos</InputLabel>
 
             <Select
               labelId="demo-simple-select-label"
@@ -80,7 +141,38 @@ const [chart, setChart] = useState(null);
               <MenuItem value={20}>20</MenuItem>
             </Select>
             </FormControl>
+            </div>
+            <br/>
+
+            <div className={classes.text_box}>
+            <TextField id="outlined-basic" label="Tamaño de muestra (n)" variant="outlined" value={n} onChange={handleChangeN}/>
+            </div>
+            <div className={classes.text_box}>
+                <TextField id="outlined-basic" label="Valor de la semilla (x)" variant="outlined" value={x} onChange={handleChangeX}/>
+            </div>
+            <div className={classes.text_box}>
+                <TextField id="outlined-basic" label="Valor de K" variant="outlined" value={k} onChange={handleChangeK}/>
+            </div>
+            <div className={classes.text_box}>
+                <TextField id="outlined-basic" label="Valor de G" variant="outlined" value={g} onChange={handleChangeG}/>
+            </div>
+            <div className={classes.text_box}>
+                <TextField id="outlined-basic" label="Valor de C" variant="outlined" value={c} onChange={handleChangeC}/>
+            </div>
+              <div className={classes.button}>
+                   <Button variant="contained" color="primary" onClick={handleChangeSend}>
+                        Enviar
+                   </Button>
+              </div>
+
+
+            <div style={{ textAlign: '-webkit-center' }}>
+                <canvas id="myChart" className="chart" width="400" height="400"></canvas>
+            </div>
+
+
         </div>
+
     );
 };
 
