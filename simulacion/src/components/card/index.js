@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef } from 'react';
 import ApiRequest from '../../util/ApiRequest'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -6,14 +6,28 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-
+import MaterialTable from 'material-table';
 import Chart from 'chart.js';
 import './_shared.css';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
 
 const Card = () => {
-    
+
+    const tableIcons = {
+        FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+        LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+        NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+        PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+        ArrowDownward: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+      };
+
     const [interval, setInterval] = React.useState('');
     const [datos, setDatos] = useState(null);
+    const [datosChi, setDatosChi] = useState([]);
     const [x, setX] = useState(null);
     const [k, setK] = useState(null);
     const [n, setN] = useState(null);
@@ -94,32 +108,26 @@ n: 1000, intervalos: interval
         switch (method) {
             case 'full-random':
                 ApiRequest.get('/full-random', {n, intervalos: interval}).then(async ({ data }) => {
-                    let tableData = data.map(dato => JSON.parse(dato)).map(d => {
-                        return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
-                    });
-                    
-                    let tableDataList = [...tableData]
-                    setDatos(tableDataList);
+                    let chartData = data.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let tableData = data.map(dato => JSON.parse(dato)).map(dato => ({fo: dato.frecuencia}));
+                    setDatos([...chartData]);
+                    setDatosChi(tableData);
                 })
                 break;
             case 'congruencial-lineal':
                 ApiRequest.get(`/congruencial-lineal`, {n, x, k, c, g, intervalos: interval}).then(async ({ data }) => {
-                    let tableData = data.map(dato => JSON.parse(dato)).map(d => {
-                        return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
-                    });
-                    
-                    let tableDataList = [...tableData]
-                    setDatos(tableDataList);
+                    let chartData = data.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let tableData = data.map(dato => JSON.parse(dato)).map(dato => ({fo: dato.frecuencia ? dato.frecuencia : 0}));
+                    setDatos([...chartData]);
+                    setDatosChi(tableData);
                 })
                 break;
             case 'congruencial-multiplicativo':
                 ApiRequest.get(`/congruencial-multiplicativo`, {n, x, k, g, intervalos: interval}).then(async ({ data }) => {
-                    let tableData = data.map(dato => JSON.parse(dato)).map(d => {
-                        return [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]
-                    });
-                    
-                    let tableDataList = [...tableData]
-                    setDatos(tableDataList);
+                    let chartData = data.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let tableData = data.map(dato => JSON.parse(dato)).map(dato => ({fo: dato.frecuencia}));
+                    setDatos([...chartData]);
+                    setDatosChi(tableData);
                 })    
                 break;
             default:
@@ -129,9 +137,11 @@ n: 1000, intervalos: interval
 
     return (
         <div class="column">
+            <div class="row">
             <div class="histogram">
                 <canvas id="myChart" className="chart"></canvas>
                 <span class="text">Intervalos</span>
+            </div>
             </div>
             <div class="row">
             <FormControl className="select">
@@ -171,9 +181,43 @@ n: 1000, intervalos: interval
             <TextField id="outlined-basic" label="Valor de G" variant="outlined" value={g} onChange={handleChangeG}/>
             <TextField id="outlined-basic" label="Valor de C" variant="outlined" value={c} onChange={handleChangeC}/>
         </div>
+        <div class="row">
+
                    <Button variant="contained" color="primary" onClick={handleChangeSend}>
                         Enviar
                    </Button>
+        </div>
+
+        <React.Fragment>
+        <MaterialTable
+        icons={tableIcons}
+        title={false}
+        localization={{
+            pagination: {
+                labelRowsSelect: "filas",
+                firstTooltip: "Primera Página",
+                previousTooltip: "Página Anterior",
+                nextTooltip: "Siguiente Página",
+                lastTooltip: "Última Página"
+            },
+            body: {
+                emptyDataSourceMessage: "No existen registros para mostrar.",
+            }
+        }}
+        options={{search: false, rowStyle: {
+            'font-family': 'Roboto,Helvetica Neue,sans-serif',
+            'font-size': '14px',
+            'color': 'rgba(0, 0, 0, 0.54)'
+          }}}
+        columns={[
+            { title: 'fo', field: 'fo' },
+            { title: 'fe', field: 'fe' },
+            { title: 'C', field: 'C' },//, type: 'numeric'
+            { title: 'CA', field: 'CA' },//, type: 'numeric'
+          ]}
+        data={datosChi}
+      />
+        </React.Fragment>
     </div>
     );
 };
