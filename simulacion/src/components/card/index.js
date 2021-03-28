@@ -30,7 +30,7 @@ function drawChart() {
     setChart(new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: datos?.map(d => d[1]),
+            labels: datos?.map(d => d[1].toFixed(4)),
             datasets: [{
                 label: 'Frecuencias',
                 data: datos?.map(d => d[0]),
@@ -38,7 +38,8 @@ function drawChart() {
                 datos?.map(d => 'rgba(54, 162, 235, 0.2)'),
                 borderColor:
                 datos?.map(d => 'rgba(54, 162, 235, 1)'),
-                borderWidth: 1
+                borderWidth: 1,
+                barThickness: datos ? 460 / datos.length : 'flex'
             }]
         },
         options: {
@@ -128,7 +129,10 @@ n: 1000, intervalos: interval
 
     return (
         <div class="column">
-            <canvas id="myChart" className="chart"></canvas>
+            <div class="histogram">
+                <canvas id="myChart" className="chart"></canvas>
+                <span class="text">Intervalos</span>
+            </div>
             <div class="row">
             <FormControl className="select">
             <InputLabel id="method-select-label">Método</InputLabel>

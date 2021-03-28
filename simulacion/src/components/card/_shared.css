@@ -20,3 +20,17 @@
 .select {
   padding: 0 15px 0 15px;
 }
+
+.histogram {
+  margin-bottom: 15px;
+  width: 500px;
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.text {
+  font-family: Roboto,Helvetica Neue,sans-serif;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.54)
+}
