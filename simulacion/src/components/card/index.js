@@ -108,24 +108,39 @@ n: 1000, intervalos: interval
         switch (method) {
             case 'full-random':
                 ApiRequest.get('/full-random', {n, intervalos: interval}).then(async ({ data }) => {
-                    let chartData = data.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
-                    let tableData = data.map(dato => JSON.parse(dato)).map(dato => ({fo: dato.frecuencia}));
+                    let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
+                        fo: dato.fo ? dato.fo : 0,
+                        fe: dato.fe ? dato.fe : 0,
+                        C: dato.C ? dato.C : 0,
+                        CA: dato.CA ? dato.CA : 0
+                    }));
                     setDatos([...chartData]);
                     setDatosChi(tableData);
                 })
                 break;
             case 'congruencial-lineal':
                 ApiRequest.get(`/congruencial-lineal`, {n, x, k, c, g, intervalos: interval}).then(async ({ data }) => {
-                    let chartData = data.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
-                    let tableData = data.map(dato => JSON.parse(dato)).map(dato => ({fo: dato.frecuencia ? dato.frecuencia : 0}));
+                    let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
+                        fo: dato.fo ? dato.fo : 0,
+                        fe: dato.fe ? dato.fe : 0,
+                        C: dato.C ? dato.C : 0,
+                        CA: dato.CA ? dato.CA : 0
+                    }));
                     setDatos([...chartData]);
                     setDatosChi(tableData);
                 })
                 break;
             case 'congruencial-multiplicativo':
                 ApiRequest.get(`/congruencial-multiplicativo`, {n, x, k, g, intervalos: interval}).then(async ({ data }) => {
-                    let chartData = data.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
-                    let tableData = data.map(dato => JSON.parse(dato)).map(dato => ({fo: dato.frecuencia}));
+                    let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
+                        fo: dato.fo ? dato.fo : 0,
+                        fe: dato.fe ? dato.fe : 0,
+                        C: dato.C ? dato.C : 0,
+                        CA: dato.CA ? dato.CA : 0
+                    }));
                     setDatos([...chartData]);
                     setDatosChi(tableData);
                 })    
