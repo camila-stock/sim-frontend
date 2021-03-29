@@ -5,6 +5,7 @@ const Card = () => {
 
     const [datos, setDatos] = useState(null);
 
+    //TODO: Agregar en un useEfect para que no haga requests en loop
     ApiRequest.get(`/histogram`).then(async ({ data }) => {
         console.log("data: " , data);
         setDatos(data)
