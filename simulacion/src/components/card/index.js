@@ -112,8 +112,8 @@ n: 1000, intervalos: interval
                     let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
                         fo: dato.fo ? dato.fo : 0,
                         fe: dato.fe ? dato.fe : 0,
-                        C: dato.C ? dato.C : 0,
-                        CA: dato.CA ? dato.CA : 0
+                        C: dato.C ? dato.C.toFixed(4) : 0,
+                        CA: dato.CA ? dato.CA.toFixed(4) : 0
                     }));
                     setDatos([...chartData]);
                     setDatosChi(tableData);
@@ -125,8 +125,8 @@ n: 1000, intervalos: interval
                     let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
                         fo: dato.fo ? dato.fo : 0,
                         fe: dato.fe ? dato.fe : 0,
-                        C: dato.C ? dato.C : 0,
-                        CA: dato.CA ? dato.CA : 0
+                        C: dato.C ? dato.C.toFixed(4) : 0,
+                        CA: dato.CA ? dato.CA.toFixed(4): 0
                     }));
                     setDatos([...chartData]);
                     setDatosChi(tableData);
@@ -138,8 +138,8 @@ n: 1000, intervalos: interval
                     let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
                         fo: dato.fo ? dato.fo : 0,
                         fe: dato.fe ? dato.fe : 0,
-                        C: dato.C ? dato.C : 0,
-                        CA: dato.CA ? dato.CA : 0
+                        C: dato.C ? dato.C.toFixed(4) : 0,
+                        CA: dato.CA ? dato.CA.toFixed(4) : 0
                     }));
                     setDatos([...chartData]);
                     setDatosChi(tableData);
