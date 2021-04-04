@@ -250,39 +250,6 @@ const Card = () => {
                     data={datosChi}
                 />
             </React.Fragment>
-
-            <React.Fragment id="2">
-                <MaterialTable
-                    icons={tableIcons}
-                    title={false}
-                    localization={{
-                        pagination: {
-                            labelRowsSelect: "filas",
-                            firstTooltip: "Primera Página",
-                            previousTooltip: "Página Anterior",
-                            nextTooltip: "Siguiente Página",
-                            lastTooltip: "Última Página"
-                        },
-                        body: {
-                            emptyDataSourceMessage: "No existen registros para mostrar.",
-                        }
-                    }}
-                    options={{
-                        search: false, rowStyle: {
-                            'font-family': 'Roboto,Helvetica Neue,sans-serif',
-                            'font-size': '14px',
-                            'color': 'rgba(0, 0, 0, 0.54)'
-                        }
-                    }}
-                    columns={[
-                        { title: 'numeros', field: 'number' },
-                    ]}
-                    data={numbers}
-                />
-            </React.Fragment>
-            
-            
-
         </div>
     );
 };
