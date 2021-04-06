@@ -27,6 +27,7 @@ const Card = () => {
 
     const [interval, setInterval] = React.useState('');
     const [datos, setDatos] = useState(null);
+    const [datosNumbers, setDatosNumbers] = useState([]);
     const [datosChi, setDatosChi] = useState([]);
     const [x, setX] = useState(null);
     const [k, setK] = useState(null);
@@ -117,7 +118,9 @@ n: 1000, intervalos: interval
                         C: dato.C ? dato.C.toFixed(4) : 0,
                         CA: dato.CA ? dato.CA.toFixed(4) : 0
                     }));
+                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
                     setDatos([...chartData]);
+                    setDatosNumbers([...numbersData]);
                     setDatosChi(tableData);
                 })
                 break;
@@ -131,6 +134,8 @@ n: 1000, intervalos: interval
                         C: dato.C ? dato.C.toFixed(4) : 0,
                         CA: dato.CA ? dato.CA.toFixed(4): 0
                     }));
+                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
+                    setDatosNumbers([...numbersData]);
                     setDatos([...chartData]);
                     setDatosChi(tableData);
                 })
@@ -145,7 +150,10 @@ n: 1000, intervalos: interval
                         C: dato.C ? dato.C.toFixed(4) : 0,
                         CA: dato.CA ? dato.CA.toFixed(4) : 0
                     }));
+                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
+                    console.log(data.numbers.map((dato, i) => ({ value: dato, number: i})))
                     setDatos([...chartData]);
+                    setDatosNumbers([...numbersData]);
                     setDatosChi(tableData);
                 })    
                 break;
@@ -209,7 +217,6 @@ n: 1000, intervalos: interval
         <React.Fragment>
         <MaterialTable
         icons={tableIcons}
-        title={false}
         localization={{
             pagination: {
                 labelRowsSelect: "filas",
@@ -235,6 +242,33 @@ n: 1000, intervalos: interval
             { title: 'CA', field: 'CA' },//, type: 'numeric'
           ]}
         data={datosChi}
+      />
+        </React.Fragment>
+        <React.Fragment>
+        <MaterialTable
+        icons={tableIcons}
+        localization={{
+            pagination: {
+                labelRowsSelect: "filas",
+                firstTooltip: "Primera Página",
+                previousTooltip: "Página Anterior",
+                nextTooltip: "Siguiente Página",
+                lastTooltip: "Última Página"
+            },
+            body: {
+                emptyDataSourceMessage: "No existen registros para mostrar.",
+            }
+        }}
+        options={{search: false, rowStyle: {
+            'font-family': 'Roboto,Helvetica Neue,sans-serif',
+            'font-size': '14px',
+            'color': 'rgba(0, 0, 0, 0.54)'
+          }}}
+        columns={[
+            { title: 'nro', field: 'number' },
+            { title: 'value', field: 'value' },
+          ]}
+        data={datosNumbers}
       />
         </React.Fragment>
     </div>
