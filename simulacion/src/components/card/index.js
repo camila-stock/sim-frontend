@@ -28,12 +28,13 @@ const Card = () => {
     const [interval, setInterval] = React.useState('');
     const [datos, setDatos] = useState(null);
     const [datosNumbers, setDatosNumbers] = useState([]);
-    const [datosChi, setDatosChi] = useState([]);
-    const [x, setX] = useState(null);
-    const [k, setK] = useState(null);
+    const [table, setTable] = useState([]);
     const [n, setN] = useState(null);
-    const [g, setG] = useState(null);
-    const [c, setC] = useState(null);
+    const [a, setA] = useState(null);
+    const [b, setB] = useState(null);
+    const [lambda, setLambda] = useState(null);
+    const [media, setMedia] = useState(null);
+    const [desviacion, setDesviacion] = useState(null);
     window.google.charts.load('current', { packages: ['corechart'] });
 
 
@@ -46,7 +47,7 @@ const Card = () => {
         setChart(new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: datos?.map(d => d[1].toFixed(4)),
+                labels: datos?.map(d => d[1]),
                 datasets: [{
                     label: 'Frecuencias',
                     data: datos?.map(d => d[0]),
@@ -90,71 +91,58 @@ n: 1000, intervalos: interval
         setN(event.target.value);
       };
 
-    const handleChangeX = (event) => {
-        setX(event.target.value);
+    const handleChangeTable = (event) => {
+        setTable(event.target.value);
       };
 
-      const handleChangeK = (event) => {
-        setK(event.target.value);
+      const handleChangeA = (event) => {
+        setA(event.target.value);
       };
 
-      const handleChangeC = (event) => {
-        setC(event.target.value);
+      const handleChangeB = (event) => {
+        setB(event.target.value);
       };
 
-      const handleChangeG = (event) => {
-        setG(event.target.value);
+      const handleChangeLambda = (event) => {
+        setLambda(event.target.value);
       };
+
+      const handleChangeMedia = (event) => {
+        setMedia(event.target.value);
+      };
+
+      const handleChangeDesviacion = (event) => {
+        setDesviacion(event.target.value);
+      };
+
+      const parseData = (data) => {
+        let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
+                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
+                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
+                        intervalo : dato.intervalo ? dato.intervalo :0,
+                        fo: dato.fo ? dato.fo  : 0,
+                        fe: dato.fe ? dato.fe : 0,
+                    }));
+                    setDatos([...chartData]);
+                    setDatosNumbers([...numbersData]);
+                    setTable([...tableData])
+      }
 
       const handleChangeSend = (event) => {
         switch (method) {
-            case 'full-random':
-                ApiRequest.get('/full-random', {n, intervalos: interval}).then(async ({ data }) => {
-                    let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
-                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
-                        intervalo : dato.intervalo ? dato.intervalo.toFixed(4) :0,
-                        fo: dato.fo ? dato.fo  : 0,
-                        fe: dato.fe ? dato.fe.toFixed(4) : 0,
-                        C: dato.C ? dato.C.toFixed(4) : 0,
-                        CA: dato.CA ? dato.CA.toFixed(4) : 0
-                    }));
-                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
-                    setDatos([...chartData]);
-                    setDatosNumbers([...numbersData]);
-                    setDatosChi(tableData);
+            case 'uniforme-a-b':
+                ApiRequest.get('/uniforme-a-b', {a, b, n, intervalos: interval}).then(async ({ data }) => {
+                    parseData(data)
                 })
                 break;
-            case 'congruencial-lineal':
-                ApiRequest.get(`/congruencial-lineal`, {n, x, k, c, g, intervalos: interval}).then(async ({ data }) => {
-                    let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
-                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
-                        intervalo : dato.intervalo ? dato.intervalo.toFixed(4) :0,
-                        fo: dato.fo ? dato.fo : 0,
-                        fe: dato.fe ? dato.fe.toFixed(4) : 0,
-                        C: dato.C ? dato.C.toFixed(4) : 0,
-                        CA: dato.CA ? dato.CA.toFixed(4): 0
-                    }));
-                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
-                    setDatosNumbers([...numbersData]);
-                    setDatos([...chartData]);
-                    setDatosChi(tableData);
+            case 'exponencial':
+                ApiRequest.get(`/exponencial`, {n, lambda, intervalos: interval}).then(async ({ data }) => {
+                    parseData(data)
                 })
                 break;
-            case 'congruencial-multiplicativo':
-                ApiRequest.get(`/congruencial-multiplicativo`, {n, x, k, g, intervalos: interval}).then(async ({ data }) => {
-                    let chartData = data.chart.map(dato => JSON.parse(dato)).map(d => [d.frecuencia ? d.frecuencia : 0, d.cota_superior ]);
-                    let tableData = data.table.map(dato => JSON.parse(dato)).map(dato => ({
-                        intervalo : dato.intervalo ? dato.intervalo.toFixed(4) :0,
-                        fo: dato.fo ? dato.fo : 0,
-                        fe: dato.fe ? dato.fe.toFixed(4) : 0,
-                        C: dato.C ? dato.C.toFixed(4) : 0,
-                        CA: dato.CA ? dato.CA.toFixed(4) : 0
-                    }));
-                    let numbersData = data.numbers.map((dato, i) => ({ value: dato, number: i}))
-                    console.log(data.numbers.map((dato, i) => ({ value: dato, number: i})))
-                    setDatos([...chartData]);
-                    setDatosNumbers([...numbersData]);
-                    setDatosChi(tableData);
+            case 'normal':
+                ApiRequest.get(`/normal`, {n, media, desviacion, intervalos: interval}).then(async ({ data }) => {
+                    parseData(data)
                 })    
                 break;
             default:
@@ -180,9 +168,9 @@ n: 1000, intervalos: interval
               onChange={handleChangeMethod}
               style={{ width: 200 }}
               >
-              <MenuItem value={'congruencial-lineal'}>Congruencial lineal</MenuItem>
-              <MenuItem value={'congruencial-multiplicativo'}>Congruencial multiplicativo</MenuItem>
-              <MenuItem value={'full-random'}>Random</MenuItem>
+              <MenuItem value={'uniforme-a-b'}>Uniforme a b</MenuItem>
+              <MenuItem value={'exponencial'}>Exponencial</MenuItem>
+              <MenuItem value={'normal'}>Normal</MenuItem>
             </Select>
             </FormControl>
             <FormControl className="select">
@@ -203,17 +191,17 @@ n: 1000, intervalos: interval
         </div>
         <div class="row">
             <TextField id="outlined-basic" label="Tamaño de muestra (n)" variant="outlined" value={n} onChange={handleChangeN} />
-            <TextField id="outlined-basic" label="Valor de la semilla (x)" variant="outlined" value={x} onChange={handleChangeX}/>
-            <TextField id="outlined-basic" label="Valor de K" variant="outlined" value={k} onChange={handleChangeK}/>
-            <TextField id="outlined-basic" label="Valor de G" variant="outlined" value={g} onChange={handleChangeG}/>
-            <TextField id="outlined-basic" label="Valor de C" variant="outlined" value={c} onChange={handleChangeC}/>
+            <TextField id="outlined-basic" label="Valor de A" variant="outlined" value={a} onChange={handleChangeA}/>
+            <TextField id="outlined-basic" label="Valor de B" variant="outlined" value={b} onChange={handleChangeB}/>
+            <TextField id="outlined-basic" label="Valor de Lambda" variant="outlined" value={lambda} onChange={handleChangeLambda}/>
+            <TextField id="outlined-basic" label="Valor de Media" variant="outlined" value={media} onChange={handleChangeMedia}/>
+            <TextField id="outlined-basic" label="Valor de Desviacion" variant="outlined" value={desviacion} onChange={handleChangeDesviacion}/>
         </div>
         <div class="row">
             <Button variant="contained" color="primary" onClick={handleChangeSend}>
                     Enviar
             </Button>
         </div>
-
         <React.Fragment>
         <MaterialTable
         icons={tableIcons}
@@ -238,13 +226,11 @@ n: 1000, intervalos: interval
             { title: 'intervalo', field: 'intervalo' },
             { title: 'fo', field: 'fo' },
             { title: 'fe', field: 'fe' },
-            { title: 'C', field: 'C' },//, type: 'numeric'
-            { title: 'CA', field: 'CA' },//, type: 'numeric'
           ]}
-        data={datosChi}
+        data={table}
       />
         </React.Fragment>
-        <React.Fragment>
+       <React.Fragment>
         <MaterialTable
         icons={tableIcons}
         localization={{
@@ -259,7 +245,7 @@ n: 1000, intervalos: interval
                 emptyDataSourceMessage: "No existen registros para mostrar.",
             }
         }}
-        options={{search: false, rowStyle: {
+        options={{search: false,paging: true, rowStyle: {
             'font-family': 'Roboto,Helvetica Neue,sans-serif',
             'font-size': '14px',
             'color': 'rgba(0, 0, 0, 0.54)'
