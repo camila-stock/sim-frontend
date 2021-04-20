@@ -222,6 +222,7 @@ n: 1000, intervalos: interval
             'font-size': '14px',
             'color': 'rgba(0, 0, 0, 0.54)'
           }}}
+        title="Datos"
         columns={[
             { title: 'intervalo', field: 'intervalo' },
             { title: 'fo', field: 'fo' },
@@ -250,9 +251,10 @@ n: 1000, intervalos: interval
             'font-size': '14px',
             'color': 'rgba(0, 0, 0, 0.54)'
           }}}
+        title="Numeros generados aleat."
         columns={[
             { title: 'nro', field: 'number' },
-            { title: 'value', field: 'value' },
+            { title: 'valor', field: 'value' },
           ]}
         data={datosNumbers}
       />
